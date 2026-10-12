@@ -29,16 +29,22 @@ jobs:
       - name: Bump version in README
         id: version
         run: |
-          # Use grep -E (extended regex) instead of -P for compatibility
+          # Debug: show README banner lines
+          grep -n "banner-dark" README.md
+          # Extract version (matches v9, v10, v11, etc.)
           CURRENT=$(grep -oE 'banner-dark\.v[0-9]+' README.md | head -1 | grep -oE '[0-9]+')
+          echo "CURRENT='$CURRENT'"
           if [ -z "$CURRENT" ]; then
             CURRENT=9
           fi
           NEXT=$((CURRENT + 1))
           echo "current=$CURRENT" >> $GITHUB_OUTPUT
           echo "next=$NEXT" >> $GITHUB_OUTPUT
+          echo "NEXT=$NEXT"
           sed -i "s/banner-dark\.v${CURRENT}/banner-dark.v${NEXT}/g" README.md
           sed -i "s/banner-light\.v${CURRENT}/banner-light.v${NEXT}/g" README.md
+          # Verify changes
+          grep -n "banner-dark" README.md
       - name: Commit & push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -46,6 +52,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           NEXT=${{ steps.version.outputs.next }}
+          echo "NEXT from output: $NEXT"
+          ls -la assets/banner-*.v${NEXT}.svg
           git add assets/banner-*.v${NEXT}.svg README.md
           git diff --staged --quiet || git commit -m "chore: regenerate banner v${NEXT} with photo"
           git push
