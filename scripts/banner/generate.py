@@ -143,6 +143,34 @@ def floyd_steinberg(gray: np.ndarray) -> np.ndarray:
     return out
 
 
+def smart_crop_center(img: Image.Image, target_size: tuple[int, int] = (300, 340)) -> Image.Image:
+    """Center crop on the subject (using alpha channel) and resize to target_size."""
+    # Get bounding box of non-transparent pixels
+    alpha = img.getchannel("A") if img.mode in ("RGBA", "LA") else None
+    if alpha:
+        bbox = alpha.getbbox()
+        if bbox:
+            cx = (bbox[0] + bbox[2]) / 2
+            cy = (bbox[1] + bbox[3]) / 2
+        else:
+            cx, cy = img.width / 2, img.height / 2
+    else:
+        cx, cy = img.width / 2, img.height / 2
+
+    # Square crop size: use min dimension, slightly expanded for shoulders
+    crop_size = min(img.width, img.height)
+    crop_size = min(int(crop_size * 1.15), max(img.width, img.height))
+
+    half = crop_size // 2
+    left = max(0, min(cx - half, img.width - crop_size))
+    top = max(0, min(cy - half, img.height - crop_size))
+    right = left + crop_size
+    bottom = top + crop_size
+
+    cropped = img.crop((left, top, right, bottom))
+    return cropped.resize(target_size, Image.Resampling.LANCZOS)
+
+
 def placeholder_source() -> Image.Image:
     """Initials stand-in used until assets/source/photo.png exists."""
     from PIL import ImageFont
@@ -176,8 +204,8 @@ def placeholder_source() -> Image.Image:
 def portrait_points(theme: str, rng: np.random.Generator) -> np.ndarray:
     """Return sampled x/y banner coordinates from a 300x340 dither grid."""
     source = Image.open(SOURCE).convert("RGBA") if SOURCE.exists() else placeholder_source()
-    # Tighter head + shoulders crop so face detail fills the VISUAL.MAP frame.
-    crop = source.crop((18, 28, 390, 450)).resize((300, 340), Image.Resampling.LANCZOS)
+    # Smart crop centered on subject, then resize to 300x340
+    crop = smart_crop_center(source, (300, 340))
     rgb = crop.convert("RGB")
     alpha = np.asarray(crop.getchannel("A"), dtype=np.float32) / 255.0
 
@@ -209,7 +237,9 @@ def portrait_points(theme: str, rng: np.random.Generator) -> np.ndarray:
     ys, xs = np.where(active)
     if len(xs) == 0:
         return np.zeros((0, 2), dtype=np.float32)
-    points = np.column_stack((74 + xs, 154 + ys)).astype(np.float32)
+    # Center in VISUAL.MAP frame: frame center (244, 331) - dither center (150, 170) = (94, 161)
+    offset_x, offset_y = 94, 161
+    points = np.column_stack((offset_x + xs, offset_y + ys)).astype(np.float32)
     if len(points) > 18000:
         points = points[rng.choice(len(points), 18000, replace=False)]
     return points
@@ -484,7 +514,7 @@ def main() -> None:
         for name, points in sampled.items():
             np.save(DATA / f"{name}-{theme}.npy", points)
         svg = render_svg(theme, portraits[theme], sampled, rng)
-        output = ASSETS / f"banner-{theme}.v10.svg"
+        output = ASSETS / f"banner-{theme}.v11.svg"
         output.write_text(svg, encoding="utf-8")
         byte_size = output.stat().st_size
         print(
