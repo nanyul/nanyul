@@ -25,7 +25,9 @@ jobs:
       - name: Install deps
         run: pip install -r scripts/banner/requirements.txt
       - name: Generate banner
-        run: python scripts/banner/generate.py
+        run: |
+          set -e
+          python scripts/banner/generate.py 2>&1
       - name: Bump version in README
         id: version
         run: |
