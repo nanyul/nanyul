@@ -27,7 +27,7 @@ jobs:
       - name: Generate banner
         run: |
           set -e
-          python scripts/banner/generate.py 2>&1
+          python scripts/banner/generate.py --version ${{ steps.version.outputs.next }} 2>&1
       - name: Bump version in README
         id: version
         run: |

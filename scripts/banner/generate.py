@@ -2,17 +2,27 @@
 """Generate the animated GitHub profile banners.
 
 Run from the repository root:
-    python scripts/banner/generate.py
+    python scripts/banner/generate.py --version 12
 """
 
 from __future__ import annotations
 
+import argparse
 import html
 import math
 from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageOps
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Generate animated GitHub profile banners")
+    parser.add_argument("--version", type=int, default=None, help="Banner version number (e.g., 12)")
+    return parser.parse_args()
+
+
+args = parse_args()
 from scipy.optimize import linear_sum_assignment
 from scipy.spatial.distance import cdist
 
@@ -506,6 +516,20 @@ def main() -> None:
         portraits[theme] = points
         np.save(DATA / f"portrait-{theme}.npy", points)
 
+    # Determine version: from args, or extract from README, or default to 11
+    version = args.version
+    if version is None:
+        # Try to extract from README
+        readme = ROOT / "README.md"
+        if readme.exists():
+            import re
+            content = readme.read_text()
+            match = re.search(r"banner-dark\.v(\d+)", content)
+            if match:
+                version = int(match.group(1)) + 1  # next version
+    if version is None:
+        version = 11
+
     for index, theme in enumerate(THEMES):
         rng = np.random.default_rng(SEED + 100 + index)
         sampled = {
@@ -515,7 +539,7 @@ def main() -> None:
         for name, points in sampled.items():
             np.save(DATA / f"{name}-{theme}.npy", points)
         svg = render_svg(theme, portraits[theme], sampled, rng)
-        output = ASSETS / f"banner-{theme}.v11.svg"
+        output = ASSETS / f"banner-{theme}.v{version}.svg"
         output.write_text(svg, encoding="utf-8")
         byte_size = output.stat().st_size
         print(
