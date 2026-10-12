@@ -1,0 +1,45 @@
+{
+  "title": "Skill Radar",
+  "axes": [
+    {
+      "label": "HTML / CSS",
+      "value": 85
+    },
+    {
+      "label": "JavaScript",
+      "value": 78
+    },
+    {
+      "label": "Web Animations",
+      "value": 85
+    },
+    {
+      "label": "UI / UX Design",
+      "value": 75
+    },
+    {
+      "label": "Frontend Logic",
+      "value": 70
+    },
+    {
+      "label": "Backend / Logic",
+      "value": 65
+    },
+    {
+      "label": "TypeScript",
+      "value": 60
+    },
+    {
+      "label": ".NET / C#",
+      "value": 70
+    },
+    {
+      "label": "Java / PHP",
+      "value": 55
+    },
+    {
+      "label": "Git / GitHub",
+      "value": 70
+    }
+  ]
+}

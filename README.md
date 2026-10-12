@@ -1,16 +1,28 @@
 <div align="center">
 
+<!-- BANNER - terminal profile.sh --live (animado). Generado por scripts/banner/generate.py.
+     Pesa ~0.7 MB cada uno. Agrega ?v=N al nombre si lo regeneras para limpiar la caché. -->
+<picture>
+  <source media="(prefers-color-scheme: dark)"  srcset="assets/banner-dark.v9.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/banner-light.v9.svg">
+  <img src="assets/banner-dark.v9.svg" width="100%" alt="profile.sh --live">
+</picture>
+
+<br>
+
+<!-- NOMBRE / TAGLINE - texto animado -->
 <a href="https://github.com/nanyul">
-  <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=26&duration=2600&pause=900&color=AA9BEF&center=true&vCenter=true&width=880&lines=Yuliana+Norori+-+Desarrolladora+Web;HTML+%2F+CSS+%2F+JavaScript;Construyendo+desde+Costa+Rica+%F0%9F%87%A8%F0%9F%87%B7" alt="typing banner" />
+  <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=26&duration=2600&pause=900&color=AA9BEF&center=true&vCenter=true&width=880&lines=Yuliana+Norori+-+Desarrolladora+Web;HTML+%2F+CSS+%2F+JavaScript;Animaciones+Web+%2F+Frontend+Creativo;Construyendo+desde+Costa+Rica" alt="typing banner">
 </a>
 
-<!-- Agrega aquí tus redes: cambia TU-USUARIO por el tuyo y descomenta -->
-<!--
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/TU-USUARIO/)
-[![Instagram](https://img.shields.io/badge/Instagram-0d1117?style=for-the-badge&logo=instagram&logoColor=aa9bef)](https://instagram.com/TU-USUARIO)
--->
+<br>
 
-![profile views](https://komarev.com/ghpvc/?username=nanyul&style=flat&color=aa9bef&label=profile+views)
+<a href="https://www.linkedin.com/in/yuliana-norori-71881b242/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>&nbsp;&nbsp;
+<a href="https://instagram.com/araya.nans"><img src="https://img.shields.io/badge/Instagram-0d1117?style=for-the-badge&logo=instagram&logoColor=aa9bef" alt="Instagram"></a>
+
+<br>
+
+<img src="https://komarev.com/ghpvc/?username=nanyul&style=flat&color=aa9bef&label=profile+views" alt="profile views">
 
 </div>
 
@@ -19,43 +31,89 @@
 ## Este es mi espacio :)
 
 ¡Hola! Soy **Yuliana**, desarrolladora web desde Costa Rica 🇨🇷.
-Me gusta crear interfaces que se vean bien, se sientan fluidas y que cualquier persona pueda usar sin complicarse.
+Me gusta crear interfaces que se vean bien, se sientan fluidas y que cualquiera pueda usar sin complicarse.
 
-- 🎨 Diseño y desarrollo páginas web con **HTML, CSS y JavaScript**.
+- 🎨 Diseño y desarrollo páginas web con **HTML, CSS, JavaScript, TypeScript y React**.
+- ⚙️ He trabajado con **Java, C#, PHP y SignalR** en el backend.
 - 🧪 Me encanta experimentar con **animaciones web** y detalles visuales.
 - 📚 Aprendiendo y construyendo proyectos reales, uno a la vez.
 - 🌱 **Mi meta:** seguir creciendo como desarrolladora y compartir lo que aprendo.
 - 💬 Hablemos de **diseño web, frontend y proyectos en equipo**.
 
-## Mi stack
+<br>
 
 <div align="center">
 
-[![tech stack](https://skillicons.dev/icons?i=html,css,js,git,github,vscode&perline=6)](https://skillicons.dev)
+## mi stack
+
+<img src="https://skillicons.dev/icons?i=html,css,js,ts,react,java,cs,php,git,github,vscode&perline=6" alt="tech stack">
 
 </div>
 
 ---
 
-## Proyectos destacados
+<div align="center">
+
+## signals
+
+<table>
+<tr>
+<td width="50%" align="center" valign="middle">
+
+<!-- Radar autoevaluado: edita assets/skills.json y el workflow lo redibuja -->
+<picture>
+  <source media="(prefers-color-scheme: dark)"  srcset="assets/radar-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/radar-light.svg">
+  <img src="assets/radar-dark.svg" width="400" alt="skill radar chart">
+</picture>
+
+</td>
+<td width="50%" align="center" valign="middle">
+
+<!-- Radar de stack web: edita assets/langmix.json -->
+<picture>
+  <source media="(prefers-color-scheme: dark)"  srcset="assets/radar-langs-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/radar-langs-light.svg">
+  <img src="assets/radar-langs-dark.svg" width="400" alt="web stack radar chart">
+</picture>
+
+</td>
+</tr>
+</table>
+
+</div>
+
+---
+
+## proyectos
 
 | Proyecto | Descripción | Tecnología |
 | --- | --- | --- |
+| [Encriptador](https://github.com/nanyul/Encriptador) | Encriptador de texto con interfaz web | CSS |
+| [GotaVida](https://github.com/nanyul/GotaVida) | Gota de Vida - Proyecto de Diseño de Aplicaciones Web | JavaScript |
+| [Subasta_Merakelia](https://github.com/nanyul/Subasta_Merakelia) | Merakelia - Subasta web en línea | JavaScript |
 | [Animaciones_Web](https://github.com/nanyul/Animaciones_Web) | Animaciones web con CSS y JavaScript | HTML |
-| [GotaVida](https://github.com/nanyul/GotaVida) | Segundo proyecto de Diseño de Aplicaciones Web | JavaScript |
-| [Encriptador](https://github.com/nanyul/Encriptador) | Encriptador de texto | CSS |
-| [Subasta_Merakelia](https://github.com/nanyul/Subasta_Merakelia) | Proyecto de subasta web | JavaScript |
-| [Investigaciones-Cortas](https://github.com/nanyul/Investigaciones-Cortas) | Investigaciones cortas | HTML |
-| [Key_to_Art](https://github.com/KeylinRojas15/Key_to_Art) | Proyecto I: Diseño e implementación de páginas web (colaboración) | HTML |
+| [Amaretto_Cakes](https://github.com/nanyul/Amaretto_Cakes) | Full-stack .NET con Clean Architecture (API, App, Infra, Web) | C# |
 
 ---
 
-## ¿Los números importan? Claro que sí.
-
 <div align="center">
 
-![GitHub stats](https://github-readme-stats.vercel.app/api?username=nanyul&show_icons=true&theme=dark&hide_border=true&bg_color=0d1117&title_color=aa9bef&icon_color=aa9bef&text_color=c9d1d9)
-![Top languages](https://github-readme-stats.vercel.app/api/top-langs/?username=nanyul&layout=compact&theme=dark&hide_border=true&bg_color=0d1117&title_color=aa9bef&text_color=c9d1d9)
+## ¿Los números importan? Claro que sí.
+
+<!-- Generado por scripts/cards.py dentro de este mismo repo (no depende de
+     github-readme-stats, que a veces se cae). Aparece después de la primera
+     corrida del workflow "Charts and cards". -->
+<picture>
+  <source media="(prefers-color-scheme: dark)"  srcset="assets/card-stats-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/card-stats-light.svg">
+  <img src="assets/card-stats-dark.svg" width="480" alt="GitHub statistics">
+</picture>
+
+<br>
+
+<!-- Generado por el workflow "Metrics" (necesita el secret METRICS_TOKEN) -->
+<img src="assets/metrics.languages.svg" height="165" alt="most used languages">
 
 </div>
 
@@ -63,6 +121,6 @@ Me gusta crear interfaces que se vean bien, se sientan fluidas y que cualquier p
 
 <div align="center">
 
-`Hecho con cariño · @nanyul`
+<sub>` Hecho con cariño · @nanyul `</sub>
 
 </div>

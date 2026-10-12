@@ -1,0 +1,34 @@
+{
+  "title": "Language Stack",
+  "_comment": "Radar escrito a mano, 0-100. VALORES DE EJEMPLO: cámbialos por los tuyos y el workflow 'Charts and cards' lo redibuja.",
+  "axes": [
+    {
+      "label": "HTML",
+      "value": 85
+    },
+    {
+      "label": "CSS",
+      "value": 82
+    },
+    {
+      "label": "JavaScript",
+      "value": 72
+    },
+    {
+      "label": "TypeScript",
+      "value": 60
+    },
+    {
+      "label": "Java",
+      "value": 62
+    },
+    {
+      "label": "C#",
+      "value": 60
+    },
+    {
+      "label": "PHP",
+      "value": 58
+    }
+  ]
+}
