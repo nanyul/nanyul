@@ -3,9 +3,9 @@
 <!-- BANNER - terminal profile.sh --live (animado). Generado por scripts/banner/generate.py.
      Pesa ~0.7 MB cada uno. Agrega ?v=N al nombre si lo regeneras para limpiar la caché. -->
 <picture>
-  <source media="(prefers-color-scheme: dark)"  srcset="assets/banner-dark.v9.svg">
-  <source media="(prefers-color-scheme: light)" srcset="assets/banner-light.v9.svg">
-  <img src="assets/banner-dark.v9.svg" width="100%" alt="profile.sh --live">
+  <source media="(prefers-color-scheme: dark)"  srcset="assets/banner-dark.v10.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/banner-light.v10.svg">
+  <img src="assets/banner-dark.v10.svg" width="100%" alt="profile.sh --live">
 </picture>
 
 <br>
@@ -94,6 +94,22 @@ Me gusta crear interfaces que se vean bien, se sientan fluidas y que cualquiera 
 | [Subasta_Merakelia](https://github.com/nanyul/Subasta_Merakelia) | Merakelia - Subasta web en línea | JavaScript |
 | [Animaciones_Web](https://github.com/nanyul/Animaciones_Web) | Animaciones web con CSS y JavaScript | HTML |
 | [Amaretto_Cakes](https://github.com/nanyul/Amaretto_Cakes) | Full-stack .NET con Clean Architecture (API, App, Infra, Web) | C# |
+
+---
+
+## Project Cards
+
+<div align="center">
+
+| Encriptador | Gota de Vida | Merakelia |
+|:---:|:---:|:---:|
+| <picture><source media="(prefers-color-scheme: dark)" srcset="assets/card-Encriptador-dark.svg"><img src="assets/card-Encriptador-light.svg" width="300" alt="Encriptador"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="assets/card-GotaVida-dark.svg"><img src="assets/card-GotaVida-light.svg" width="300" alt="Gota de Vida"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="assets/card-Subasta_Merakelia-dark.svg"><img src="assets/card-Subasta_Merakelia-light.svg" width="300" alt="Merakelia"></picture> |
+
+| Animaciones Web | Amaretto Cakes |
+|:---:|:---:|
+| <picture><source media="(prefers-color-scheme: dark)" srcset="assets/card-Animaciones_Web-dark.svg"><img src="assets/card-Animaciones_Web-light.svg" width="300" alt="Animaciones Web"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="assets/card-Amaretto_Cakes-dark.svg"><img src="assets/card-Amaretto_Cakes-light.svg" width="300" alt="Amaretto Cakes"></picture> |
+
+</div>
 
 ---
 
