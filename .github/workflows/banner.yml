@@ -16,6 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -24,15 +27,25 @@ jobs:
       - name: Generate banner
         run: python scripts/banner/generate.py
       - name: Bump version in README
+        id: version
         run: |
-          CURRENT=$(grep -oP 'banner-dark\.v\d+' README.md | head -1 | grep -oP '\d+')
+          # Use grep -E (extended regex) instead of -P for compatibility
+          CURRENT=$(grep -oE 'banner-dark\.v[0-9]+' README.md | head -1 | grep -oE '[0-9]+')
+          if [ -z "$CURRENT" ]; then
+            CURRENT=9
+          fi
           NEXT=$((CURRENT + 1))
-          sed -i "s/banner-dark.v${CURRENT}/banner-dark.v${NEXT}/g" README.md
-          sed -i "s/banner-light.v${CURRENT}/banner-light.v${NEXT}/g" README.md
+          echo "current=$CURRENT" >> $GITHUB_OUTPUT
+          echo "next=$NEXT" >> $GITHUB_OUTPUT
+          sed -i "s/banner-dark\.v${CURRENT}/banner-dark.v${NEXT}/g" README.md
+          sed -i "s/banner-light\.v${CURRENT}/banner-light.v${NEXT}/g" README.md
       - name: Commit & push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          NEXT=${{ steps.version.outputs.next }}
           git add assets/banner-*.v${NEXT}.svg README.md
           git diff --staged --quiet || git commit -m "chore: regenerate banner v${NEXT} with photo"
           git push
