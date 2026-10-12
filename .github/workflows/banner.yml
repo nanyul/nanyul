@@ -1,0 +1,38 @@
+name: Banner
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "assets/source/photo.png"
+      - "scripts/banner/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  banner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: pip install -r scripts/banner/requirements.txt
+      - name: Generate banner
+        run: python scripts/banner/generate.py
+      - name: Bump version in README
+        run: |
+          CURRENT=$(grep -oP 'banner-dark\.v\d+' README.md | head -1 | grep -oP '\d+')
+          NEXT=$((CURRENT + 1))
+          sed -i "s/banner-dark.v${CURRENT}/banner-dark.v${NEXT}/g" README.md
+          sed -i "s/banner-light.v${CURRENT}/banner-light.v${NEXT}/g" README.md
+      - name: Commit & push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/banner-*.v${NEXT}.svg README.md
+          git diff --staged --quiet || git commit -m "chore: regenerate banner v${NEXT} with photo"
+          git push
