@@ -167,15 +167,21 @@ def smart_crop_center(img: Image.Image, target_size: tuple[int, int] = (300, 340
     else:
         cx, cy = img.width / 2, img.height / 2
 
-    # Square crop = smaller dimension of image (375 for 375x529)
-    crop_size = min(img.width, img.height)
+    # Rectangular crop matching target aspect ratio (300/340 ≈ 0.882)
+    target_aspect = target_size[0] / target_size[1]
+    crop_w = img.width
+    crop_h = int(crop_w / target_aspect)
+    # Don't exceed image height
+    if crop_h > img.height:
+        crop_h = img.height
+        crop_w = int(crop_h * target_aspect)
 
-    half = crop_size // 2
+    half_w, half_h = crop_w // 2, crop_h // 2
     # Clamp: center on subject, don't go outside image bounds
-    left = max(0, min(int(cx - half), img.width - crop_size))
-    top = max(0, min(int(cy - half), img.height - crop_size))
-    right = left + crop_size
-    bottom = top + crop_size
+    left = max(0, min(int(cx - half_w), img.width - crop_w))
+    top = max(0, min(int(cy - half_h), img.height - crop_h))
+    right = left + crop_w
+    bottom = top + crop_h
 
     cropped = img.crop((left, top, right, bottom))
     return cropped.resize(target_size, Image.Resampling.LANCZOS)
