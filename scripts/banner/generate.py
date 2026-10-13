@@ -167,11 +167,10 @@ def smart_crop_center(img: Image.Image, target_size: tuple[int, int] = (300, 340
     else:
         cx, cy = img.width / 2, img.height / 2
 
-    # Rectangular crop matching target aspect ratio (300/340 ≈ 0.882)
-    target_aspect = target_size[0] / target_size[1]
+    # Use 0.70 aspect ratio (more vertical = less zoom, shows full forehead + shoulders)
+    target_aspect = 0.70
     crop_w = img.width
     crop_h = int(crop_w / target_aspect)
-    # Don't exceed image height
     if crop_h > img.height:
         crop_h = img.height
         crop_w = int(crop_h * target_aspect)
