@@ -34,6 +34,11 @@ LOGOS = Path(__file__).resolve().parent / "logos"
 DATA = Path(__file__).resolve().parent / "data"
 
 W, H = 1180, 610
+# Portrait lattice: each lit cell is drawn as a CELL x CELL square, so the dots stay
+# crisp when GitHub scales the 1180px banner down to the README column (~890-1035px).
+CELL = 1.5
+GRID_W, GRID_H = 252, 270
+ORIGIN_X, ORIGIN_Y = 55.0, 128.5  # top-left of the lattice, centred in the VISUAL.MAP frame
 LOOP_SECONDS = 14.2
 INTRO_SECONDS = 3.2
 TRAVELLER_COUNT = 900
@@ -50,7 +55,8 @@ ROWS = [
     ("Core.Markup", "HTML · CSS"),
     ("Core.Frontend", "React · CSS Animations · Responsive UI"),
     ("Core.Realtime", "SignalR"),
-    ("Core.Projects", "Encriptador · Gota de Vida · Merakelia · Animaciones Web · Amaretto Cakes"),
+    ("Core.Projects", "Encriptador · Gota de Vida · Merakelia"),
+    ("", "Animaciones Web · Amaretto Cakes"),
     ("Grid.Mail", "nyarayanori@gmail.com"),
     ("Grid.LinkedIn", "/in/yuliana-norori-71881b242"),
     ("Grid.GitHub", "nanyul"),
@@ -153,37 +159,19 @@ def floyd_steinberg(gray: np.ndarray) -> np.ndarray:
     return out
 
 
-def smart_crop_center(img: Image.Image, target_size: tuple[int, int] = (300, 340)) -> Image.Image:
-    """Center crop on the subject (using alpha channel) and resize to target_size."""
-    # Get bounding box of non-transparent pixels
-    alpha = img.getchannel("A") if img.mode in ("RGBA", "LA") else None
-    if alpha:
-        bbox = alpha.getbbox()
-        if bbox:
-            cx = (bbox[0] + bbox[2]) / 2
-            cy = (bbox[1] + bbox[3]) / 2
-        else:
-            cx, cy = img.width / 2, img.height / 2
-    else:
-        cx, cy = img.width / 2, img.height / 2
-
-    # Use 0.70 aspect ratio (more vertical = less zoom, shows full forehead + shoulders)
-    target_aspect = 0.70
+def smart_crop(img: Image.Image, size: tuple[int, int] = (GRID_W, GRID_H)) -> Image.Image:
+    """Crop head-and-shoulders keeping the lattice aspect ratio (no stretching), then resize."""
+    bbox = img.getchannel("A").getbbox() or (0, 0, img.width, img.height)
+    aspect = size[0] / size[1]
     crop_w = img.width
-    crop_h = int(crop_w / target_aspect)
+    crop_h = round(crop_w / aspect)
     if crop_h > img.height:
         crop_h = img.height
-        crop_w = int(crop_h * target_aspect)
-
-    half_w, half_h = crop_w // 2, crop_h // 2
-    # Clamp: center on subject, don't go outside image bounds
-    left = max(0, min(int(cx - half_w), img.width - crop_w))
-    top = max(0, min(int(cy - half_h), img.height - crop_h))
-    right = left + crop_w
-    bottom = top + crop_h
-
-    cropped = img.crop((left, top, right, bottom))
-    return cropped.resize(target_size, Image.Resampling.LANCZOS)
+        crop_w = round(crop_h * aspect)
+    left = (img.width - crop_w) // 2
+    top = max(0, min(bbox[1] - int(0.03 * crop_h), img.height - crop_h))
+    cropped = img.crop((left, top, left + crop_w, top + crop_h))
+    return cropped.resize(size, Image.Resampling.LANCZOS)
 
 
 def placeholder_source() -> Image.Image:
@@ -217,47 +205,42 @@ def placeholder_source() -> Image.Image:
 
 
 def portrait_points(theme: str, rng: np.random.Generator) -> np.ndarray:
-    """Return sampled x/y banner coordinates from a 300x340 dither grid."""
+    """Return banner coordinates (cell centres) of the lit cells of a GRID_W x GRID_H dither."""
+    from scipy.ndimage import gaussian_filter
+
     source = Image.open(SOURCE).convert("RGBA") if SOURCE.exists() else placeholder_source()
-    # Smart crop centered on subject, then resize to 300x340
-    crop = smart_crop_center(source, (300, 340))
-    rgb = crop.convert("RGB")
+    crop = smart_crop(source)
+    rgb = np.asarray(crop.convert("RGB"), dtype=np.float32)
     alpha = np.asarray(crop.getchannel("A"), dtype=np.float32) / 255.0
+    subject = alpha > 0.35
+
+    lum = (rgb @ np.array([0.299, 0.587, 0.114], dtype=np.float32)) / 255.0
+    # Stretch tones using the subject only, then add local contrast (masked blur so the
+    # empty background does not bleed into the edges) to bring out eyes, glasses and lips.
+    lo, hi = np.percentile(lum[subject], [1.5, 98.5])
+    lum = np.clip((lum - lo) / max(hi - lo, 1e-3), 0, 1)
+    weight = gaussian_filter(subject.astype(np.float32), 12) + 1e-6
+    local = gaussian_filter(lum * subject, 12) / weight
+    lum = np.clip(lum + 0.85 * (lum - local), 0, 1)
 
     if theme == "dark":
-        lum = np.asarray(ImageOps.grayscale(rgb), dtype=np.float32)
-        prepared = Image.fromarray(np.uint8(np.clip(lum * alpha, 0, 255)), "L")
-        select_lit = True
+        # Lit dots on a dark panel. Lift the shadows so black hair keeps a faint speckle and
+        # the silhouette stays readable; skin lands mid-density so features show as gaps.
+        bright = np.where(subject, 0.12 + 0.88 * lum**1.7, 0.0)
+        bits = floyd_steinberg(np.uint8(np.clip(bright, 0, 1) * 255))
+        active = bits & subject
     else:
-        white = Image.new("RGBA", crop.size, "white")
-        white.alpha_composite(crop)
-        prepared = ImageOps.grayscale(white.convert("RGB"))
-        select_lit = False
+        # Ink dots on a light panel: density follows darkness, with a floor so skin is not empty.
+        ink = np.where(subject, 0.05 + 0.90 * (1.0 - lum) ** 1.25, 0.0)
+        bits = floyd_steinberg(np.uint8(np.clip(1.0 - ink, 0, 1) * 255))
+        active = ~bits & subject
 
-    # Equalize against the subject only (ignore empty alpha) so lit skin vs dark
-    # hair doesn't crush midtones; then punch local contrast for facial edges.
-    if theme == "dark":
-        mask = Image.fromarray(np.uint8((alpha > 0.08) * 255), "L")
-        prepared = ImageOps.equalize(prepared, mask=mask)
-    else:
-        prepared = ImageOps.autocontrast(prepared, cutoff=1)
-    prepared = ImageEnhance.Contrast(prepared).enhance(1.35)
-    prepared = prepared.filter(ImageFilter.UnsharpMask(radius=2, percent=175, threshold=1))
-    bits = floyd_steinberg(np.asarray(prepared))
-    active = bits if select_lit else ~bits
-    if theme == "dark":
-        active &= alpha > 0.08
-
-    # Keep the full 300×340 lattice — skipping 2×2 cells was the soft/blurry look.
     ys, xs = np.where(active)
     if len(xs) == 0:
         return np.zeros((0, 2), dtype=np.float32)
-    # Center in VISUAL.MAP frame: frame center (244, 331) - dither center (150, 170) = (94, 161)
-    offset_x, offset_y = 94, 161
-    points = np.column_stack((offset_x + xs, offset_y + ys)).astype(np.float32)
-    if len(points) > 18000:
-        points = points[rng.choice(len(points), 18000, replace=False)]
-    return points
+    return np.column_stack(
+        (ORIGIN_X + (xs + 0.5) * CELL, ORIGIN_Y + (ys + 0.5) * CELL)
+    ).astype(np.float32)
 
 
 def sample_logo_points(
@@ -286,11 +269,11 @@ def num(value: float) -> str:
 
 
 def point_path(points: np.ndarray) -> str:
-    """Aggregate adjacent horizontal one-pixel dots into compact SVG path runs."""
+    """Aggregate horizontally adjacent lattice cells into compact SVG runs (stroke-width = CELL)."""
     if not len(points):
         return ""
-    integer = np.rint(points).astype(int)
-    unique = sorted({(int(x), int(y)) for x, y in integer}, key=lambda p: (p[1], p[0]))
+    idx = np.rint((points - np.array([ORIGIN_X, ORIGIN_Y])) / CELL - 0.5).astype(int)
+    unique = sorted({(int(x), int(y)) for x, y in idx}, key=lambda p: (p[1], p[0]))
     chunks: list[str] = []
     i = 0
     while i < len(unique):
@@ -300,7 +283,9 @@ def point_path(points: np.ndarray) -> str:
         while i < len(unique) and unique[i][1] == y and unique[i][0] <= x1 + 1:
             x1 = unique[i][0]
             i += 1
-        chunks.append(f"M{x0} {y}h{x1 - x0 + 1}")
+        chunks.append(
+            f"M{num(ORIGIN_X + x0 * CELL)} {num(ORIGIN_Y + (y + 0.5) * CELL)}h{num((x1 - x0 + 1) * CELL)}"
+        )
     return "".join(chunks)
 
 
@@ -376,10 +361,10 @@ def render_svg(
         'font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="13" '
         'font-weight="700" letter-spacing="1.2">VISUAL.MAP</text>',
         f'<text x="438" y="111" text-anchor="end" fill="{t["muted"]}" '
-        'font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="11">300×340 / 1-BIT</text>',
+        f'font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="11">{GRID_W}×{GRID_H} / 1-BIT</text>',
         f'<path d="M49 141h12M49 141v12M439 141h-12M439 141v12M49 539h12M49 539v-12'
         f'M439 539h-12M439 539v-12" fill="none" stroke="{t["chrome"]}" opacity=".55"/>',
-        '<g clip-path="url(#visualClip)" shape-rendering="crispEdges">',
+        '<g clip-path="url(#visualClip)" shape-rendering="geometricPrecision">',
         # Loop layer stays visible at t=0 so camo/static first frames still show the face.
         # Intro duplicate below shimmers on top, then hands off at 3.2s.
         '<g opacity="1">',
@@ -397,7 +382,7 @@ def render_svg(
         delta = (browser_centroid - centroid) * 0.18 + noise[band]
         d = point_path(pts)
         parts.append(
-            f'<path d="{d}" fill="none" stroke="{t["portrait"]}" stroke-width="1" '
+            f'<path d="{d}" fill="none" stroke="{t["portrait"]}" stroke-width="{CELL}" '
             'opacity=".94">'
             f'<animateTransform attributeName="transform" type="translate" begin="{INTRO_SECONDS}s" '
             f'dur="{LOOP_SECONDS}s" repeatCount="indefinite" calcMode="linear" '
@@ -412,7 +397,7 @@ def render_svg(
     for i in range(n):
         positions = animate_values(frames, i)
         parts.append(
-            f'<path d="M-.65-.65h1.3v1.3h-1.3z" fill="{t["portrait"]}">'
+            f'<path d="M-.75-.75h1.5v1.5h-1.5z" fill="{t["portrait"]}">'
             f'<animateTransform attributeName="transform" type="translate" begin="{INTRO_SECONDS}s" '
             f'dur="{LOOP_SECONDS}s" repeatCount="indefinite" calcMode="linear" '
             f'keyTimes="{key_times}" values="{positions}"/>'
@@ -433,7 +418,7 @@ def render_svg(
             continue
         parts.append(
             f'<path d="{point_path(pts)}" fill="none" stroke="{t["portrait"]}" '
-            'stroke-width="1" opacity="0">'
+            f'stroke-width="{CELL}" opacity="0">'
             f'<animate attributeName="opacity" begin="{num(starts[group])}s" dur=".8s" '
             'values="0;1" fill="freeze"/>'
             '<animate attributeName="opacity" begin="3.08s" dur=".12s" values="1;0" fill="freeze"/>'
@@ -475,6 +460,15 @@ def render_svg(
         label_len = text_width(label, 14)
         leader_start = 491 + label_len + 12
         leader_end = value_right - value_len - 12
+        if not label:
+            parts.append(
+                f'<text x="{num(value_right)}" y="{num(row_y)}" text-anchor="end" '
+                f'fill="{t["text"]}" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" '
+                f'font-size="14" textLength="{num(value_len)}" lengthAdjust="spacingAndGlyphs">'
+                f"{html.escape(value)}</text>"
+            )
+            row_y += 23
+            continue
         parts.extend(
             [
                 f'<text x="491" y="{num(row_y)}" fill="{t["muted"]}" '
