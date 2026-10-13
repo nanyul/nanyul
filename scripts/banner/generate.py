@@ -167,14 +167,13 @@ def smart_crop_center(img: Image.Image, target_size: tuple[int, int] = (300, 340
     else:
         cx, cy = img.width / 2, img.height / 2
 
-    # Square crop size: use min dimension, slightly expanded for shoulders
-    # but never larger than the image dimensions
-    max_crop = min(img.width, img.height)
-    crop_size = min(int(max_crop * 1.15), max_crop)
+    # Square crop = smaller dimension of image (375 for 375x529)
+    crop_size = min(img.width, img.height)
 
     half = crop_size // 2
-    left = max(0, min(cx - half, img.width - crop_size))
-    top = max(0, min(cy - half, img.height - crop_size))
+    # Clamp: center on subject, don't go outside image bounds
+    left = max(0, min(int(cx - half), img.width - crop_size))
+    top = max(0, min(int(cy - half), img.height - crop_size))
     right = left + crop_size
     bottom = top + crop_size
 
