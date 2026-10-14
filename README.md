@@ -112,7 +112,7 @@ Me gusta crear interfaces que se vean bien, se sientan fluidas y que cualquiera 
 
 <br>
 
-<!-- Generado por el workflow "Metrics" (necesita el secret METRICS_TOKEN) -->
+<!-- Generado por el workflow "Metrics" (usa METRICS_TOKEN o el token integrado de GitHub) -->
 <img src="assets/metrics.languages.svg" height="165" alt="most used languages">
 
 </div>

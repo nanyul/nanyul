@@ -30,9 +30,10 @@ python scripts/banner/generate.py
 ## 3. Activar los workflows
 
 1. Repo → **Settings → Actions → General → Workflow permissions** → *Read and write permissions*.
-2. Crea un Personal Access Token (GitHub → Settings → Developer settings → Tokens) y guárdalo en
-   el repo como secret llamado `METRICS_TOKEN` (**Settings → Secrets and variables → Actions**).
-   Lo necesita el gráfico de lenguajes y los números de contribuciones.
+2. Opcionalmente, crea un Personal Access Token (GitHub → Settings → Developer settings → Tokens) y
+   guárdalo en el repo como secret llamado `METRICS_TOKEN` (**Settings → Secrets and variables →
+   Actions**). Si no existe ese secret, el workflow usa automáticamente el token integrado de GitHub;
+   el PAT permite obtener métricas más completas, especialmente las contribuciones.
 3. Pestaña **Actions** → ejecuta manualmente *Charts and cards* y *Metrics* (**Run workflow**).
    Crean `card-*.svg` y `metrics.languages.svg`, que el README ya referencia.
    Hasta esa primera corrida esas dos imágenes se ven rotas.

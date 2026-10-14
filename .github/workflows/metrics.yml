@@ -13,14 +13,14 @@ permissions:
 
 jobs:
   metrics:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       # Lenguajes más usados (por bytes, con peso a la actividad reciente).
-      # Requiere un secret METRICS_TOKEN (Personal Access Token). Ver INSTRUCCIONES.md
+      # METRICS_TOKEN es opcional; si falta, se usa el token integrado de GitHub.
       - name: Languages
         uses: lowlighter/metrics@latest
         with:
-          token: ${{ secrets.METRICS_TOKEN }}
+          token: ${{ secrets.METRICS_TOKEN || github.token }}
           user: nanyul
           filename: assets/metrics.languages.svg
           base: ""
